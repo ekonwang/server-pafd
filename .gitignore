@@ -1,0 +1,14 @@
+# Default ignored files
+.idea
+.idea/
+_reshape/.idea/
+account
+/get-info.txt
+/tst.py
+/account.txt
+/sess.data
+/dailyFudan3.1.py
+.DS_Store
+*.log
+*.out
+log/
