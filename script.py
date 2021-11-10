@@ -5,7 +5,7 @@ from main import get_account, Zlapp
 
 class Runner(Zlapp):
 
-    Path = '/root/pafd/log/'
+    Path = '/root/server-pafd/log/'
     zlapp_login = 'https://uis.fudan.edu.cn/authserver/login?' \
                 'service=https://zlapp.fudan.edu.cn/site/ncov/fudanDaily'
     code_url = "https://zlapp.fudan.edu.cn/backend/default/code"
@@ -84,7 +84,7 @@ class Runner(Zlapp):
 
 if __name__ == '__main__':
 
-    runner = Runner("10:30:00")
+    runner = Runner("12:00:00")
     runner.runScript()
 
 # nohup python3 -u script.py > script.log 2>&1 &
