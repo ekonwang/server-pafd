@@ -6,9 +6,9 @@ from main import get_account, Zlapp
 class Runner(Zlapp):
 
     Path = '/root/server-pafd/log/'
-    zlapp_login = 'https://uis.fudan.edu.cn/authserver/login?' \
+    """ zlapp_login = 'https://uis.fudan.edu.cn/authserver/login?' \
                 'service=https://zlapp.fudan.edu.cn/site/ncov/fudanDaily'
-    code_url = "https://zlapp.fudan.edu.cn/backend/default/code"
+    code_url = "https://zlapp.fudan.edu.cn/backend/default/code" """
 
     def __init__(self, run_time):
         self.run_time = self.check_time(run_time)
@@ -65,9 +65,8 @@ class Runner(Zlapp):
             with open(LogFileName, "w+") as f:
                 origin = sys.stdout
                 sys.stdout = f
-                uid, psw, code_id, code_psw = get_account()
-                daily_fudan = Zlapp(uid, psw, code_id, code_psw,
-                            url_login=self.zlapp_login, url_code=self.code_url)
+                uid, psw = get_account()
+                daily_fudan = Zlapp(uid, psw)
                 daily_fudan.login()
                 if daily_fudan.check() == 0:
                     daily_fudan.checkin()
