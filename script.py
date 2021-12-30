@@ -65,8 +65,8 @@ class Runner(Zlapp):
             with open(LogFileName, "w+") as f:
                 origin = sys.stdout
                 sys.stdout = f
-                uid, psw = get_account()
-                daily_fudan = Zlapp(uid, psw)
+                uid, psw, uname, pwd = get_account()
+                daily_fudan = Zlapp(uid, psw, uname, pwd)
                 daily_fudan.login()
                 if daily_fudan.check() == 0:
                     daily_fudan.checkin()

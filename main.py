@@ -10,6 +10,7 @@ import base64
 import easyocr
 import io
 import numpy
+import requests
 from PIL import Image
 from PIL import ImageEnhance
 
@@ -24,7 +25,7 @@ class Fudan:
 
     # 初始化会话
     def __init__(self,
-                 uid, psw,
+                 uid, psw, uname, pwd,
                  url_login='https://uis.fudan.edu.cn/authserver/login',
                  url_code="https://zlapp.fudan.edu.cn/backend/default/code"):
         """
@@ -41,6 +42,8 @@ class Fudan:
 
         self.uid = uid
         self.psw = psw
+        self.uname = uname
+        self.pwd = pwd
 
     def _page_init(self):
         """
@@ -182,11 +185,23 @@ class Zlapp(Fudan):
                                 free_list=free_list[0],
                                 detail = 0)
         return result[0]
+
+    def read_captcha2(self, img_byte):
+        base64_data = base64.b64encode(img_byte)
+        b64 = base64_data.decode()
+        data = {"username": self.uname, "password": self.pwd, "typeid": 3, "image": b64}
+        result = json.loads(requests.post("http://api.ttshitu.com/predict", json=data).text)
+        if result['success']:
+            return result["data"]["result"]
+        else:
+            print('码云验证码识别出错: ')
+            print(result["message"])
+            exit()
     
 
     def validate_code(self):
         img = self.session.get(self.url_code).content
-        return self.read_captcha(img)
+        return self.read_captcha2(img)
 
     def checkin(self):
         """
@@ -255,32 +270,34 @@ def get_account():
             sys_exit()
         uid = (raw[0].split(":"))[1].strip()
         psw = (raw[1].split(":"))[1].strip()
+        uname = (raw[2].split(":"))[1].strip()
+        pwd = (raw[3].split(":"))[1].strip()
 
     else:
         print("未找到account.txt, 判断为首次运行, 请接下来依次输入学号密码")
-        uid = input("学号：")
-        psw = getpass("密码：")
+        uid = input("学号:")
+        psw = getpass("密码:")
         with open("account.txt", "w") as new:
             tmp = "uid:" + uid + "\npsw:" + psw +\
                 "\n\n\n以上两行冒号后分别写上学号密码，不要加空格/换行，谢谢\n\n请注意文件安全，不要放在明显位置\n\n可以从dailyFudan.exe创建快捷方式到桌面"
             new.write(tmp)
         print("账号已保存在目录下account.txt，请注意文件安全，不要放在明显位置\n\n建议拉个快捷方式到桌面")
 
-    return uid, psw
+    return uid, psw, uname, pwd
 
 
 if __name__ == '__main__':
-    uid, psw = get_account()
+    uid, psw, uname, pwd = get_account()
     # print(uid, psw)
     zlapp_login = 'https://uis.fudan.edu.cn/authserver/login?' \
                   'service=https://zlapp.fudan.edu.cn/site/ncov/fudanDaily'
     code_url = "https://zlapp.fudan.edu.cn/backend/default/code"
-    daily_fudan = Zlapp(uid, psw,
+    daily_fudan = Zlapp(uid, psw, uname, pwd,
                         url_login=zlapp_login, url_code=code_url)
     daily_fudan.login()
 
-    daily_fudan.check()
-    daily_fudan.checkin()
+    if daily_fudan.check() == 0:
+        daily_fudan.checkin()
     # 再检查一遍
     daily_fudan.check()
     daily_fudan.close(1)
