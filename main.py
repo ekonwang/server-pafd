@@ -131,7 +131,6 @@ class Fudan:
         self.session.close()
         print("◉关闭会话")
         print("************************")
-        sys_exit(exit_code)
 
 
 class Zlapp(Fudan):
