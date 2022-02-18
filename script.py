@@ -1,6 +1,9 @@
 import os
+from sqlite3 import Date
 import sys
 import time
+import datetime
+import random
 from main import get_account, Zlapp
 
 class Runner(Zlapp):
@@ -50,10 +53,11 @@ class Runner(Zlapp):
         now = time.localtime()
         today_run_time = time.strptime(self.get_today() + " " + self.run_time, "%Y-%m-%d %H:%M:%S")
         tomorrow_run_time = time.strptime(self.get_tomorrow() + " " + self.run_time, "%Y-%m-%d %H:%M:%S")
-        if now < today_run_time:
-            return self.get_time_delta(now, today_run_time)
-        else:
-            return self.get_time_delta(now, tomorrow_run_time)
+        return self.get_time_delta(now, tomorrow_run_time) 
+        #if now < today_run_time:
+        #   return self.get_time_delta(now, today_run_time)
+        #else:
+        #   return self.get_time_delta(now, tomorrow_run_time) 
     
     def runScript(self):
         """ 
@@ -73,17 +77,20 @@ class Runner(Zlapp):
                     daily_fudan.check()
                     daily_fudan.close(1)
 
-                sleep_secs = self.get_future_run_time()
-                print("\n\n===> sleeping for %.2f hours." %(sleep_secs/3600))
+                sleep_secs = self.get_future_run_time() 
+                real_secs = random.randint(-3600, 3600) + sleep_secs
+                print("\n\n===> expected sleeping for %.2f hours." %(sleep_secs/3600))
+                print("\n\n===> really sleeping for %.2f hours." %(real_secs/3600))
+                print("\n\n===> Program wake at ", datetime.datetime.now()+datetime.timedelta(seconds=real_secs))
 
                 sys.stdout = origin
             
-            time.sleep(sleep_secs)
+            time.sleep(real_secs)
 
 
 if __name__ == '__main__':
 
-    runner = Runner("12:00:00")
+    runner = Runner("18:00:00")
     runner.runScript()
 
 # nohup python3 -u script.py > script.log 2>&1 &
