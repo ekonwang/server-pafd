@@ -90,7 +90,7 @@ class Runner(Zlapp):
 
 if __name__ == '__main__':
 
-    runner = Runner("18:00:00")
+    runner = Runner("14:00:00")
     runner.runScript()
 
 # nohup python3 -u script.py > script.log 2>&1 &
