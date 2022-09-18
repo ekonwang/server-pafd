@@ -3,6 +3,7 @@ from sqlite3 import Date
 import sys
 import time
 import datetime
+import argparse
 import random
 from main import get_account, Zlapp
 
@@ -59,13 +60,15 @@ class Runner(Zlapp):
         #else:
         #   return self.get_time_delta(now, tomorrow_run_time) 
     
-    def runScript(self):
+    def runScript(self, logPath = None):
         """ 
         Run daily_fudan.checkin() every day at given time.
          """
+        logPath = self.Path if logPath == None else logPath
+        os.makedirs(logPath, exist_ok=True)
         while(1):
             DateStamp = self.get_today(format="%Y-%m-%d %H:%M:%S")
-            LogFileName = self.Path + DateStamp + '.log'
+            LogFileName = logPath + DateStamp + '.log'
             with open(LogFileName, "w+") as f:
                 origin = sys.stdout
                 sys.stdout = f
@@ -89,8 +92,12 @@ class Runner(Zlapp):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Argument parser')
+    parser.add_argument('--logpath', type=str, default='/root/server-pafd/log/')
+    parser.add_argument('--runtime', type=str, default='14:00:00')
+    args = parser.parse_args()
 
-    runner = Runner("14:00:00")
-    runner.runScript()
+    runner = Runner(args.runtime)
+    runner.runScript(logPath=args.logpath)
 
 # nohup python3 -u script.py > script.log 2>&1 &
